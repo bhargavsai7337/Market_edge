@@ -2,134 +2,154 @@ import React, { useState, useEffect } from "react";
 import "../main.css";
 
 const Employeemanagement = () => {
-     const [showForm, setShowForm] = useState(false);
-      const [isEditing, setIsEditing] = useState(false);
-      const [showMenu, setShowMenu] = useState(null);
-      const [viewUser, setViewUser] = useState(null);
-      const [users, setUsers] = useState([]);
-      const [idCounter, setIdCounter] = useState(1);
-      const [searchTerm, setSearchTerm] = useState("");
-    
-    const filteredUsers = users.filter(
-      (user) =>
-        user.organization_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        user.contact_person.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-    
-      const [formData, setFormData] = useState({
-        organization_name: "",
-        organization_address1: "",
-        organization_address2: "",
-        country: "",
-        state: "",
-        zipcode: "",
-        fiid: "",
-        contact_number: "",
-        contact_person: "",
-        renewal_date: "",
-        email: "",
-        status: "Inactive",
-      });
-    
-      const handleChange = (e) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
-      };
-    
-      const generateId = (num) => `TC${num.toString().padStart(3, "0")}`;
-    
-      const handleSubmit = (e) => {
-        e.preventDefault();
-    
-        if (!formData.organization_name || !formData.contact_person) {
-          alert("Organization Name and Contact Person are required!");
-          return;
-        }
-    
-        if (isEditing) {
-          setUsers(
-            users.map((user) =>
-              user.id === formData.id ? { ...formData } : user
-            )
-          );
-        } else {
-          const newUser = { ...formData, id: generateId(idCounter) };
-          setUsers([...users, newUser]);
-          setIdCounter(idCounter + 1);
-        }
-    
-        setFormData({
-          organization_name: "",
-          organization_address1: "",
-          organization_address2: "",
-          country: "",
-          state: "",
-          zipcode: "",
-          fiid: "",
-          contact_number: "",
-          contact_person: "",
-          renewal_date: "",
-          email: "",
-          status: "Inactive",
-        });
-        setShowForm(false);
-        setIsEditing(false);
-      };
-    
-      const toggleStatus = (id) => {
-        setUsers(
-          users.map((user) =>
-            user.id === id
-              ? { ...user, status: user.status === "Active" ? "Inactive" : "Active" }
-              : user
-          )
-        );
-      };
-    
-      const handleEdit = (user) => {
-        setFormData(user);
-        setIsEditing(true);
-        setShowForm(true);
-        setShowMenu(null);
-      };
-    
-      const handleDelete = (id) => {
-        if (window.confirm("Are you sure you want to delete this record?")) {
-          setUsers(users.filter((u) => u.id !== id));
-        }
-      };
-    
-      const handleView = (user) => {
-        setViewUser(user);
-        setShowMenu(null);
-      };
-    
-      const toggleMenu = (id) => {
-        setShowMenu(showMenu === id ? null : id);
-      };
-    
-      // Close dropdown when clicking outside
-      useEffect(() => {
-        const handleClickOutside = (e) => {
-          if (!e.target.closest(".menu-wrapper")) {
-            setShowMenu(null);
-          }
-        };
-        document.addEventListener("click", handleClickOutside);
-        return () => document.removeEventListener("click", handleClickOutside);
-      }, []);
+const [showForm, setShowForm] = useState(false);
+       const [isEditing, setIsEditing] = useState(false);
+       const [showMenu, setShowMenu] = useState(null);
+       const [viewUser, setViewUser] = useState(null);
+       const [users, setUsers] = useState([]);
+       const [idCounter, setIdCounter] = useState(1);
+       const [searchTerm, setSearchTerm] = useState("");
+       const [filterStatus, setFilterStatus] = useState("");
+       const [extraFilter, setExtraFilter] = useState("");
+       const totalUsers = users.length;
+       const totalClients = users.length; 
+       const activeUsers = users.filter((u) => u.status === "Active").length;
+       const inactiveUsers = users.filter((u) => u.status === "Inactive").length;
+     
+     const filteredUsers = users.filter((user) => {
+       const matchesSearch =
+         user.role.toLowerCase().includes(searchTerm.toLowerCase()) ||
+         user.first_name.toLowerCase().includes(searchTerm.toLowerCase());
+     
+       const matchesStatus =
+         filterStatus === "" ||
+         filterStatus === "All" ||
+         user.status === filterStatus;
+     
+       return matchesSearch && matchesStatus;
+     });
+     
+       const [formData, setFormData] = useState({
+         first_name:"",
+         last_name:"",
+         role:"",
+         contact_number: "",
+         email: "",
+         status: "Inactive",
+       });
+     
+       const handleChange = (e) => {
+         setFormData({ ...formData, [e.target.name]: e.target.value });
+       };
+     
+       const generateId = (num) => `TC${num.toString().padStart(3, "0")}`;
+     
+       const handleSubmit = (e) => {
+         e.preventDefault();
+     
+         if (!formData.role || !formData.first_name) {
+           alert("Organization Name and Contact Person are required!");
+           return;
+         }
+     
+         if (isEditing) {
+           setUsers(
+             users.map((user) =>
+               user.id === formData.id ? { ...formData } : user
+             )
+           );
+         } else {
+           const newUser = { ...formData, id: generateId(idCounter) };
+           setUsers([...users, newUser]);
+           setIdCounter(idCounter + 1);
+         }
+     
+         setFormData({
+           first_name:"",
+           last_name:"",
+           role:"",
+           contact_number: "",
+           email: "",
+           status: "Inactive",
+         });
+         setShowForm(false);
+         setIsEditing(false);
+       };
+     
+       const toggleStatus = (id) => {
+         setUsers(
+           users.map((user) =>
+             user.id === id
+               ? { ...user, status: user.status === "Active" ? "Inactive" : "Active" }
+               : user
+           )
+         );
+       };
+     
+       const handleEdit = (user) => {
+         setFormData(user);
+         setIsEditing(true);
+         setShowForm(true);
+         setShowMenu(null);
+       };
+     
+       const handleDelete = (id) => {
+         if (window.confirm("Are you sure you want to delete this record?")) {
+           setUsers(users.filter((u) => u.id !== id));
+         }
+       };
+     
+       const handleView = (user) => {
+         setViewUser(user);
+         setShowMenu(null);
+       };
+     
+       const toggleMenu = (id) => {
+         setShowMenu(showMenu === id ? null : id);
+       };
+     
+       // Close dropdown when clicking outside
+       useEffect(() => {
+         const handleClickOutside = (e) => {
+           if (!e.target.closest(".menu-wrapper")) {
+             setShowMenu(null);
+           }
+         };
+         document.addEventListener("click", handleClickOutside);
+         return () => document.removeEventListener("click", handleClickOutside);
+       }, []);
     
   return (
     <div className="main-container">
-      <h2>Employee Engagement</h2>
+      <h2>Employee management</h2>
       <div className="hbutt">
-        <h4>
-          comprehensive employee management with skill, team,performance tracking and client assignments
-        </h4>
+        <h5>
+         comprehensive employee management with skill, team,performance tracking and client assignments
+        </h5>
         <div className="spacer"></div>
+
         <button className="open-btn" onClick={() => setShowForm(true)}>
           + Add Employee
         </button>
       </div>
+      <div className="summary-blocks">
+  <div className="summary-card">
+    <h4>Total Users</h4>
+    <p>{totalUsers}</p>
+  </div>
+  <div className="summary-card">
+    <h4>Total Clients</h4>
+    <p>{totalClients}</p>
+  </div>
+  <div className="summary-card">
+    <h4>Active Users</h4>
+    <p>{activeUsers}</p>
+  </div>
+  <div className="summary-card">
+    <h4>Inactive Users</h4>
+    <p>{inactiveUsers}</p>
+  </div>
+</div>
 
       {/* Add/Edit Popup */}
       {showForm && (
@@ -139,75 +159,38 @@ const Employeemanagement = () => {
 
             <input
               type="text"
-              name="organization_name"
-              placeholder="Organization Name *"
-              value={formData.organization_name}
+              name="first_name"
+              placeholder="First Name *"
+              value={formData.first_name}
               onChange={handleChange}
               required
             />
             <input
               type="text"
-              name="organization_address1"
-              placeholder="Address Line 1 *"
-              value={formData.organization_address1}
+              name="last_name"
+              placeholder="Last Name *"
+              value={formData.last_name}
               onChange={handleChange}
               required
             />
-            <input
-              type="text"
-              name="organization_address2"
-              placeholder="Address Line 2"
-              value={formData.organization_address2}
-              onChange={handleChange}
-            />
-            <input
-              type="text"
-              name="country"
-              placeholder="Country"
-              value={formData.country}
-              onChange={handleChange}
-            />
-            <input
-              type="text"
-              name="state"
-              placeholder="State"
-              value={formData.state}
-              onChange={handleChange}
-            />
-            <input
-              type="text"
-              name="zipcode"
-              placeholder="Zipcode"
-              value={formData.zipcode}
-              onChange={handleChange}
-            />
-            <input
-              type="text"
-              name="fiid"
-              placeholder="FIID"
-              value={formData.fiid}
-              onChange={handleChange}
-            />
-            <input
-              type="text"
-              name="contact_person"
-              placeholder="Contact Person *"
-              value={formData.contact_person}
-              onChange={handleChange}
-              required
-            />
+            <select
+            name="role"
+            value={formData.role}
+            onChange={handleChange}
+            required
+            >
+            <option value="" disabled>
+              Select Role
+            </option>
+            <option value="Consultant">Consultant</option>
+            <option value="Manager">Manager</option>
+            </select>
+
             <input
               type="tel"
               name="contact_number"
               placeholder="Contact Number"
               value={formData.contact_number}
-              onChange={handleChange}
-            />
-            <input
-              type="date"
-              name="renewal_date"
-              placeholder="Renewal Date"
-              value={formData.renewal_date}
               onChange={handleChange}
             />
             <input
@@ -244,36 +227,20 @@ const Employeemanagement = () => {
               <strong>ID:</strong> {viewUser.id}
             </p>
             <p>
-              <strong>Organization Name:</strong> {viewUser.organization_name}
+              <strong>First Name:</strong> {viewUser.first_name}
             </p>
             <p>
-              <strong>Organization address1:</strong>{" "}
-              {viewUser.organization_address1}
+              <strong>Last Name:</strong>{" "}
+              {viewUser.last_name}
             </p>
             <p>
-              <strong>Organization address2:</strong>{" "}
-              {viewUser.organization_address2}
-            </p>
-            <p>
-              <strong>Country:</strong> {viewUser.country}
-            </p>
-            <p>
-              <strong>State:</strong> {viewUser.state}
-            </p>
-            <p>
-              <strong>Zipcode:</strong> {viewUser.zipcode}
-            </p>
-            <p>
-              <strong>Contact Person:</strong> {viewUser.contact_person}
+              <strong>Role:</strong> {viewUser.role}
             </p>
             <p>
               <strong>Email:</strong> {viewUser.email}
             </p>
             <p>
               <strong>Contact Number:</strong> {viewUser.contact_number}
-            </p>
-            <p>
-              <strong>FEIN#(Tax id):</strong> {viewUser.fiid}
             </p>
             <p>
               <strong>Status:</strong> {viewUser.status}
@@ -289,6 +256,7 @@ const Employeemanagement = () => {
       <div className="data-section">
           <div className="table-header">
     <h3>Employee Directory</h3>
+    <div className="table-controls">
     <input
       type="text"
       placeholder="Search by Organization or Contact Person..."
@@ -296,6 +264,33 @@ const Employeemanagement = () => {
       onChange={(e) => setSearchTerm(e.target.value)}
       className="search-input"
     />
+    <select
+      className="status-filter"
+      value={filterStatus}
+      placeholder="Status"
+      onChange={(e) => setFilterStatus(e.target.value)}
+    >
+      <option value="" disabled hidden>
+        Status
+      </option>
+      <option value="All">Show all</option>
+      <option value="Active">Active</option>
+      <option value="Inactive">Inactive</option>
+    </select>
+
+    <select
+    className="extra-filter"
+    value={extraFilter}
+    placeholder="Export"
+    onChange={(e) => setExtraFilter(e.target.value)}
+  >
+    <option value="" disabled hidden>
+        Export
+    </option>
+    <option value="Option1">Download by PDF</option>
+    <option value="Option2">Download by CSV</option>
+  </select>
+    </div>
   </div>
         {users.length === 0 ? (
           <p>No data available</p>
@@ -304,8 +299,10 @@ const Employeemanagement = () => {
             <thead>
               <tr>
                 <th>ID</th>
-                <th>Organization</th>
-                <th>Contact Person</th>
+                <th>first name</th>
+                <th>Role</th>
+                <th>contact number</th>
+                <th>email address</th>
                 <th>Status</th>
                 <th>Action</th>
               </tr>
@@ -314,8 +311,10 @@ const Employeemanagement = () => {
               {filteredUsers.map((user) => (
                 <tr key={user.id}>
                   <td>{user.id}</td>
-                  <td>{user.organization_name}</td>
-                  <td>{user.contact_person}</td>
+                  <td>{user.first_name}</td>
+                  <td>{user.role}</td>
+                  <td>{user.contact_number}</td>
+                  <td>{user.email}</td>
                   <td
                     className={`status ${
                       user.status === "Active" ? "active" : "inactive"
@@ -360,5 +359,6 @@ const Employeemanagement = () => {
     </div>
   );
 };
+
 
 export default Employeemanagement

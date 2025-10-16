@@ -17,8 +17,6 @@ const ClientEngagement = () => {
   const inactiveUsers = users.filter((u) => u.status === "Inactive").length;
 
 
-
-
 const filteredUsers = users.filter((user) => {
   const matchesSearch =
     user.organization_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -31,8 +29,6 @@ const filteredUsers = users.filter((user) => {
 
   return matchesSearch && matchesStatus;
 });
-
-
 
   const [formData, setFormData] = useState({
     organization_name: "",
@@ -145,7 +141,7 @@ const filteredUsers = users.filter((user) => {
           following the techflow workflow
         </h5>
         <div className="spacer"></div>
-        
+
         <button className="open-btn" onClick={() => setShowForm(true)}>
           + Add Client
         </button>
